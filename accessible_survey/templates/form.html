@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Заявка на содействие в трудоустройстве</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 18px;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px;
+      font-size: 18px;
+      background: #333;
+      border: 1px solid #555;
+      color: white;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      background: #4f46e5;
+      color: white;
+      padding: 12px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #4338ca;
+    }
+    .required::after {
+      content: " *";
+      color: red;
+    }
+    .hint {
+      font-size: 14px;
+      color: #aaa;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Заявка на содействие в трудоустройстве</h1>
+
+  <form id="survey-form">
+    {% for question in questions %}
+      <div class="form-group">
+        <label class="{% if question.required %}required{% endif %}">{{ question.text }}</label>
+        {% if question.q_type == 'text' or question.q_type == 'date' %}
+          <input type="text" name="q{{ question.id }}" id="q{{ question.id }}"
+                 {% if question.required %}required{% endif %} placeholder="{{ question.hint }}">
+        {% elif question.q_type == 'textarea' %}
+          <textarea name="q{{ question.id }}" id="q{{ question.id }}" rows="4"
+                    {% if question.required %}required{% endif %} placeholder="{{ question.hint }}"></textarea>
+        {% elif question.q_type == 'select' %}
+          <select name="q{{ question.id }}" id="q{{ question.id }}" {% if question.required %}required{% endif %}>
+            <option value="">-</option>
+            {% for opt in question.get_options_list %}
+              <option value="{{ opt }}">{{ opt }}</option>
+            {% endfor %}
+          </select>
+        {% elif question.q_type == 'checkbox' %}
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="checkbox"
+                   name="q{{ question.id }}"
+                   id="q{{ question.id }}"
+                   required
+                   style="width: auto; height: 18px; margin: 0;">
+            <label for="q{{ question.id }}" style="margin: 0; font-size: 18px; cursor: pointer;">Да</label>
+          </div>
+        {% endif %}
+        {% if question.hint %}
+          <div class="hint">{{ question.hint }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <button type="submit">Отправить</button>
+  </form>
+
+  <script>
+    // Генерируем или получаем уникальный ID пользователя
+    let respondentId = localStorage.getItem('respondent_id');
+    if (!respondentId) {
+      // Генерация UUID v4
+      respondentId = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+      );
+      localStorage.setItem('respondent_id', respondentId);
+    }
+
+    document.getElementById('survey-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const answers = [];
+      const formData = new FormData(this);
+      for (let [key, value] of formData.entries()) {
+        if (key.startsWith('q')) {
+          const isChecked = this.querySelector(`[name="${key}"]`).type === 'checkbox'
+            ? (this.querySelector(`[name="${key}"]`).checked ? 'Да' : 'Нет')
+            : value;
+          const qid = key.replace('q', '');
+          answers.push({ question_id: qid, value: isChecked });
+        }
+      }
+
+      fetch(`/api/form/{{ form_id }}/submit/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source: 'web',
+          respondent_identifier: respondentId,  // ← передаём ID
+          answers: answers
+        })
+      })
+      .then(r => r.json())
+      .then(() => {
+        alert("Спасибо! Ваша заявка отправлена.");
+        window.location.href = "/form/{{ form_id }}/";
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Ошибка отправки. Проверьте подключение.");
+      });
+    });
+  </script>
+</body>
+</html>
