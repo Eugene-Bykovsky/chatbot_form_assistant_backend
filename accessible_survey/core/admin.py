@@ -24,14 +24,15 @@ class SessionAdmin(admin.ModelAdmin):
 
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
-    list_display = ('get_respondent_id', 'question', 'value', 'get_form')
-    list_filter = ('session__form', 'question', 'session__respondent_identifier')
+    list_display = ('get_respondent_id', 'question', 'value', 'get_form_title')
+    list_filter = ('session__form', 'question',
+                   'session__respondent_identifier')
     search_fields = ('session__respondent_identifier', 'value')
 
     def get_respondent_id(self, obj):
         return obj.session.respondent_identifier
     get_respondent_id.short_description = 'Респондент ID'
 
-    def get_form(self, obj):
+    def get_form_title(self, obj):
         return obj.session.form.title
-    get_form.short_description = 'Форма'
+    get_form_title.short_description = 'Форма'
