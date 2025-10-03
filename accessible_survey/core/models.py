@@ -3,7 +3,7 @@ from django.db import models
 
 class Form(models.Model):
     title = models.CharField(max_length=200,
-                             default="Заявка на содействие в трудоустройстве")
+                             default='Заявка на содействие в трудоустройстве')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -30,7 +30,7 @@ class Question(models.Model):
     text = models.CharField(max_length=500)
     q_type = models.CharField(max_length=20, choices=TYPE_CHOICES,
                               default=TEXT)
-    options = models.TextField(blank=True, help_text="Варианты через |")
+    options = models.TextField(blank=True, help_text='Варианты через |')
     required = models.BooleanField(default=False)
     order = models.PositiveIntegerField(default=0)
     hint = models.CharField(max_length=500, blank=True)
@@ -52,7 +52,7 @@ class Session(models.Model):
     respondent_identifier = models.CharField(
         max_length=255,
         blank=True,
-        help_text="Идентификатор респондента (Telegram ID, UUID, email и т.д.)"
+        help_text='Идентификатор респондента (Telegram ID, UUID, email и т.д.)'
     )
 
 

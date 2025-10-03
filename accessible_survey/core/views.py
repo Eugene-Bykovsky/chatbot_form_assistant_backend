@@ -1,10 +1,12 @@
-from django.shortcuts import render
-from django.http import HttpResponse
 import csv
+
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.utils import timezone
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.utils import timezone
-from .models import Form, Question, Session, Answer
+
+from .models import Answer, Form, Question, Session
 from .serializers import QuestionSerializer
 
 
@@ -60,4 +62,4 @@ def submit_answers(request, form_id):
 
     session.completed_at = timezone.now()
     session.save()
-    return Response({"status": "success", "session_id": session.id})
+    return Response({'status': 'success', 'session_id': session.id})

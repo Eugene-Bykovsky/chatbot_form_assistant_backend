@@ -1,9 +1,10 @@
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-hakaton-2025-accessible-survey'
-DEBUG = True
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dev-key')
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 ALLOWED_HOSTS = ['*', '89.169.154.49', '89.169.188.30']
 
 INSTALLED_APPS = [

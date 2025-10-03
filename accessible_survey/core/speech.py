@@ -2,7 +2,7 @@ import requests
 
 
 def text_to_speech(text, folder_id, iam_token):
-    url = "https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize"
+    url = 'https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize'
     headers = {'Authorization': f'Bearer {iam_token}'}
     data = {
         'text': text,
@@ -16,4 +16,4 @@ def text_to_speech(text, folder_id, iam_token):
     if response.status_code == 200:
         return response.content
     else:
-        raise Exception(f"TTS error: {response.text}")
+        raise Exception(f'TTS error: {response.text}')
